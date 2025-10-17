@@ -1,15 +1,29 @@
 import {Request, Response} from 'express';
 import {UserService} from './user.service';
 import {catchAsync} from '../../utils/catchAsync';
+import {sendResponse} from '../../utils/sendResponse';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
-    const user = await UserService.createUser(req.body);
+    const result = await UserService.createUser(req.body);
 
-    res.status(201).json({
-        message: 'User created successfully',
-        user,
+    sendResponse(res, {
+        statusCode: 201,
         success: true,
+        message: 'User created successfully',
+        data: result,
     });
 });
 
-export const UserController = {createUser};
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+    const result = await UserService.getAllUsers();
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Users retrieved successfully',
+        data: result.data,
+        meta: result.meta,
+    });
+});
+
+export const UserController = {createUser, getAllUsers};
