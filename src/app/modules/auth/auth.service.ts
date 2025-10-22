@@ -13,7 +13,7 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
         throw new AppError(404, 'User does not exist');
     }
 
-    const isPasswordMatched = await bcryptjs.compare(
+    const isPasswordMatched = bcryptjs.compare(
         password as string,
         isUserExist.password as string,
     );

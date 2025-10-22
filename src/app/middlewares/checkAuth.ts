@@ -26,6 +26,7 @@ export const checkAuth =
             console.log(verifiedToken);
             next();
         } catch (error) {
+            console.log('jwt error');
             next(error);
         }
     };
