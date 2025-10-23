@@ -23,7 +23,8 @@ export const checkAuth =
             if (!authRoles.includes(verifiedToken.role)) {
                 throw new AppError(401, 'Unauthorized access token');
             }
-            console.log(verifiedToken);
+
+            req.user = verifiedToken;
             next();
         } catch (error) {
             console.log('jwt error');
