@@ -34,7 +34,7 @@ export interface IUser {
     currentLocation?: string;
 
     isDeleted?: boolean;
-    isActive?: string;
+    isActive?: IsActive;
     isVerified?: boolean;
     isNIDVerified?: boolean;
 
