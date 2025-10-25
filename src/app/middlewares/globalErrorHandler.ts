@@ -1,8 +1,14 @@
+import {NextFunction} from 'express';
+import {envVars} from '../config/env.config';
+import {TErrorSources} from '../interfaces/error.types';
+import {handleCastError} from '../errorHelpers/otherErrorHelpers/handleCastError';
+import AppError from '../errorHelpers/AppError';
+
 export const globalErrorHandler = (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     err: any,
     req: Request,
     res: Response,
-    next: NextFunction,
 ) => {
     if (envVars.NODE_ENV === 'development') {
         console.log(err);
