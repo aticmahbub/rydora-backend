@@ -1,17 +1,22 @@
-import {NextFunction} from 'express';
 import {envVars} from '../config/env.config';
 import {TErrorSources} from '../interfaces/error.types';
 import {handleCastError} from '../errorHelpers/otherErrorHelpers/handleCastError';
 import AppError from '../errorHelpers/AppError';
+import {handlerDuplicateError} from '../errorHelpers/otherErrorHelpers/handleDuplicateError';
+import {handlerZodError} from '../errorHelpers/otherErrorHelpers/handleZodError';
+import {handlerValidationError} from '../errorHelpers/otherErrorHelpers/handleValidationError';
+import {NextFunction, Request, Response} from 'express';
 
 export const globalErrorHandler = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     err: any,
     req: Request,
     res: Response,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    next: NextFunction,
 ) => {
     if (envVars.NODE_ENV === 'development') {
-        console.log(err);
+        console.log('Global Error Handler:', err);
     }
 
     let errorSources: TErrorSources[] = [];
