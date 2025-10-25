@@ -1,6 +1,8 @@
-import {envVars} from '../../config/env.config';
 import AppError from '../../errorHelpers/AppError';
-import {generateToken} from '../../utils/jwt';
+import {
+    createAccessTokenWithRefreshToken,
+    createUserTokens,
+} from '../../utils/userTokens';
 import {IUser} from '../user/user.interface';
 import {User} from '../user/user.model';
 import bcryptjs from 'bcryptjs';
@@ -21,18 +23,23 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
         throw new AppError(401, 'Password is not matched');
     }
 
-    const jwtPayload = {
-        userId: isUserExist._id,
-        email: isUserExist.email,
-        role: isUserExist.role,
-    };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const {password: pass, ...rest} = isUserExist.toObject();
 
-    const accessToken = generateToken(
-        jwtPayload,
-        envVars.JWT_ACCESS_SECRET,
-        envVars.JWT_EXPIRES_IN,
-    );
-    return {accessToken};
+    const userTokens = createUserTokens(isUserExist);
+
+    return {
+        accessToken: userTokens.accessToken,
+        refreshToken: userTokens.refreshToken,
+        user: rest,
+    };
 };
 
-export const AuthService = {credentialsLogin};
+const getNewAccessToken = async (refreshToken: string) => {
+    const newAccessToken = await createAccessTokenWithRefreshToken(
+        refreshToken,
+    );
+    return {accessToken: newAccessToken};
+};
+
+export const AuthService = {credentialsLogin, getNewAccessToken};

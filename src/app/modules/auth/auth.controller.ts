@@ -2,29 +2,36 @@ import {Request, Response} from 'express';
 import {catchAsync} from '../../utils/catchAsync';
 import {sendResponse} from '../../utils/sendResponse';
 import {AuthService} from './auth.service';
+import AppError from '../../errorHelpers/AppError';
+import {setAuthCookie} from '../../utils/setCookie';
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
-    const userInfo = await AuthService.credentialsLogin(req.body);
+    const loginInfo = await AuthService.credentialsLogin(req.body);
+
+    setAuthCookie(res, loginInfo);
 
     sendResponse(res, {
         statusCode: 200,
         success: true,
         message: 'User logged in successfully',
-        data: userInfo,
+        data: loginInfo,
+    });
+});
+const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        throw new AppError(401, 'No refresh token received from cookies');
+    }
+    const tokenInfo = await AuthService.getNewAccessToken(refreshToken);
+
+    setAuthCookie(res, tokenInfo);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Refresh token fetched successfully',
+        data: tokenInfo,
     });
 });
 
-// const updateUser = catchAsync(async (req: Request, res: Response) => {
-//     const userId = req.params;
-//     const updatedDoc = req.body;
-//     const userInfo = await AuthService.updateUser(userId, updatedDoc);
-
-//     sendResponse(res, {
-//         statusCode: 200,
-//         success: true,
-//         message: 'User logged in successfully',
-//         data: userInfo,
-//     });
-// });
-
-export const AuthController = {credentialsLogin};
+export const AuthController = {credentialsLogin, getNewAccessToken};
