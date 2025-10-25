@@ -1,9 +1,7 @@
 import {JwtPayload} from 'jsonwebtoken';
 import {envVars} from '../config/env.config';
-import {IsActive, IUser} from '../modules/user/user.interface';
+import {IUser} from '../modules/user/user.interface';
 import {generateToken, verifyToken} from './jwt';
-import {User} from '../modules/user/user.model';
-import AppError from '../errorHelpers/AppError';
 
 export const createUserTokens = (user: Partial<IUser>) => {
     const jwtPayload = {
@@ -34,26 +32,10 @@ export const createAccessTokenWithRefreshToken = async (
         envVars.JWT_REFRESH_SECRET,
     ) as JwtPayload;
 
-    const isUserExist = await User.findOne({email: verifiedRefreshToken.email});
-
-    if (!isUserExist) {
-        throw new AppError(404, 'User does not exist');
-    }
-
-    if (isUserExist.isDeleted) {
-        throw new AppError(410, 'User is deleted');
-    }
-    if (
-        isUserExist.isActive === IsActive.BLOCKED ||
-        isUserExist.isActive === IsActive.INACTIVE
-    ) {
-        throw new AppError(403, `User is blocked${isUserExist.isActive}`);
-    }
-
     const jwtPayload = {
-        userId: isUserExist._id,
-        email: isUserExist.email,
-        role: isUserExist.role,
+        userId: verifiedRefreshToken._id,
+        email: verifiedRefreshToken.email,
+        role: verifiedRefreshToken.role,
     };
 
     const accessToken = generateToken(

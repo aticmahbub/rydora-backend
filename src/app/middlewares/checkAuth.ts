@@ -2,6 +2,8 @@ import {NextFunction, Request, Response} from 'express';
 import AppError from '../errorHelpers/AppError';
 import jwt, {JwtPayload} from 'jsonwebtoken';
 import {envVars} from '../config/env.config';
+import {User} from '../modules/user/user.model';
+import {IsActive} from '../modules/user/user.interface';
 
 export const checkAuth =
     (...authRoles: string[]) =>
@@ -16,8 +18,23 @@ export const checkAuth =
                 accessToken,
                 envVars.JWT_ACCESS_SECRET,
             ) as JwtPayload;
-            if (!verifiedToken) {
-                throw new AppError(401, 'Invalid access token');
+
+            const isUserExist = await User.findOne({
+                email: verifiedToken.email,
+            });
+
+            if (!isUserExist) {
+                throw new AppError(404, 'User does not exist');
+            }
+
+            if (isUserExist.isDeleted) {
+                throw new AppError(410, 'User is deleted');
+            }
+            if (
+                isUserExist.isActive === IsActive.BLOCKED ||
+                isUserExist.isActive === IsActive.INACTIVE
+            ) {
+                throw new AppError(403, `User is ${isUserExist.isActive}`);
             }
 
             if (!authRoles.includes(verifiedToken.role)) {

@@ -1,3 +1,4 @@
+import {JwtPayload} from 'jsonwebtoken';
 import AppError from '../../errorHelpers/AppError';
 import {
     createAccessTokenWithRefreshToken,
@@ -6,6 +7,7 @@ import {
 import {IUser} from '../user/user.interface';
 import {User} from '../user/user.model';
 import bcryptjs from 'bcryptjs';
+import {envVars} from '../../config/env.config';
 
 const credentialsLogin = async (payload: Partial<IUser>) => {
     const {email, password} = payload;
@@ -15,7 +17,7 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
         throw new AppError(404, 'User does not exist');
     }
 
-    const isPasswordMatched = bcryptjs.compare(
+    const isPasswordMatched = await bcryptjs.compare(
         password as string,
         isUserExist.password as string,
     );
@@ -42,4 +44,32 @@ const getNewAccessToken = async (refreshToken: string) => {
     return {accessToken: newAccessToken};
 };
 
-export const AuthService = {credentialsLogin, getNewAccessToken};
+const resetPassword = async (
+    oldPassword: string,
+    newPassword: string,
+    decodedToken: JwtPayload,
+) => {
+    const user = await User.findById('68fc76535b2aa40be46ece7d');
+    // const user = await User.findById(decodedToken.userId).select('password');
+
+    console.log(user);
+    const isOldPasswordMatched = await bcryptjs.compare(
+        oldPassword,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        user!.password as string,
+    );
+
+    if (!isOldPasswordMatched) {
+        throw new AppError(401, 'Old password is not matched');
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    user!.password = await bcryptjs.hash(
+        newPassword,
+        Number(envVars.BCRYPTJS_SALT_ROUND),
+    );
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    user!.save();
+};
+
+export const AuthService = {credentialsLogin, getNewAccessToken, resetPassword};
