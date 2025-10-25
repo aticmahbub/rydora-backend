@@ -1,4 +1,4 @@
-import {Document, Types} from 'mongoose';
+import {Types} from 'mongoose';
 
 export enum DriverApproval {
     PENDING = 'PENDING',
@@ -11,7 +11,7 @@ export enum DriverStatus {
     UNAVAILABLE = 'UNAVAILABLE',
     ON_RIDE = 'ON_RIDE',
 }
-export interface IDriver extends Document {
+export interface IDriver {
     userId: Types.ObjectId;
     vehicle: Types.ObjectId;
 

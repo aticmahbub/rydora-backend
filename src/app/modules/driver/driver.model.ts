@@ -6,12 +6,12 @@ const driverSchema = new Schema<IDriver>(
         userId: {
             type: Schema.Types.ObjectId,
             ref: 'User',
-            required: true,
+            // required: true,
         },
         vehicle: {
             type: Schema.Types.ObjectId,
             ref: 'Vehicle',
-            required: true,
+            // required: true,
         },
         driverApproval: {
             type: String,
@@ -22,7 +22,7 @@ const driverSchema = new Schema<IDriver>(
         driverStatus: {
             type: String,
             enum: Object.values(DriverStatus),
-            default: DriverStatus.UNAVAILABLE,
+            default: DriverStatus.AVAILABLE,
             required: true,
         },
         drivingLicenseNo: {
@@ -38,7 +38,7 @@ const driverSchema = new Schema<IDriver>(
                 default: 'Point',
             },
             coordinates: {
-                type: [Number], // [longitude, latitude]
+                type: [Number],
                 default: [0, 0],
             },
             updatedAt: {
