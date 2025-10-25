@@ -17,6 +17,7 @@ const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
         data: loginInfo,
     });
 });
+
 const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
 
@@ -29,9 +30,30 @@ const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
         statusCode: 200,
         success: true,
-        message: 'Refresh token fetched successfully',
+        message: 'Access token fetched successfully',
         data: tokenInfo,
     });
 });
 
-export const AuthController = {credentialsLogin, getNewAccessToken};
+const logout = catchAsync(async (req: Request, res: Response) => {
+    // const accessToken = req.headers.cookie;
+
+    res.clearCookie('accessToken', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+    });
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+    });
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'User logged out successfully',
+        data: null,
+    });
+});
+
+export const AuthController = {credentialsLogin, getNewAccessToken, logout};
