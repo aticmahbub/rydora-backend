@@ -49,7 +49,7 @@ const resetPassword = async (
     newPassword: string,
     decodedToken: JwtPayload,
 ) => {
-    const user = await User.findById('68fc76535b2aa40be46ece7d');
+    const user = await User.findById(decodedToken.userId);
     // const user = await User.findById(decodedToken.userId).select('password');
 
     console.log(user);
