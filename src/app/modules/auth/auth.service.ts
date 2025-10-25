@@ -50,9 +50,7 @@ const resetPassword = async (
     decodedToken: JwtPayload,
 ) => {
     const user = await User.findById(decodedToken.userId);
-    // const user = await User.findById(decodedToken.userId).select('password');
 
-    console.log(user);
     const isOldPasswordMatched = await bcryptjs.compare(
         oldPassword,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

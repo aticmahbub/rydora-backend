@@ -44,7 +44,9 @@ export const checkAuth =
             req.user = verifiedToken;
             next();
         } catch (error) {
-            console.log('jwt error');
+            if (envVars.NODE_ENV === 'development') {
+                console.log('Global Error Handler:', error);
+            }
             next(error);
         }
     };
