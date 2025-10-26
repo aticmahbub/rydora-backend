@@ -5,7 +5,6 @@ import {User} from '../user/user.model';
 import {IGeoPoint} from '../user/user.interface';
 import {Trip} from './trip.model';
 import AppError from '../../errorHelpers/AppError';
-import {Driver} from '../driver/driver.model';
 
 const requestTrip = async (
     decodedToken: JwtPayload,
@@ -32,7 +31,7 @@ const requestTrip = async (
 };
 
 const findTrips = async (decodedToken: JwtPayload) => {
-    const driver = await Driver.findById(decodedToken.userId);
+    const driver = await User.findById(decodedToken.userId);
 
     const trip = await Trip.find({
         tripStatus: TripStatus.REQUESTED,
@@ -42,11 +41,20 @@ const findTrips = async (decodedToken: JwtPayload) => {
                     type: 'Point',
                     coordinates: driver!.currentLocation.coordinates,
                 },
-                $maxDistance: 30000, // 3 km radius
+                $maxDistance: 30000,
             },
         },
     });
     return trip;
 };
 
-export const TripService = {requestTrip, findTrips};
+const acceptTrip = async (tripId: string) => {
+    const updatedDoc = {$set: {tripStatus: TripStatus.ACCEPTED}};
+    const trip = await Trip.findByIdAndUpdate(tripId, updatedDoc, {
+        new: true,
+        runValidators: true,
+    });
+    return trip;
+};
+
+export const TripService = {requestTrip, findTrips, acceptTrip};

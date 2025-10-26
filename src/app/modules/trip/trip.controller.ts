@@ -27,5 +27,16 @@ const findTrips = catchAsync(async (req: Request, res: Response) => {
         data: trip,
     });
 });
+const acceptTrip = catchAsync(async (req: Request, res: Response) => {
+    const tripId = req.params.tripId;
 
-export const TripController = {requestTrip, findTrips};
+    const acceptedTrip = await TripService.acceptTrip(tripId);
+    sendResponse(res, {
+        success: true,
+        statusCode: 201,
+        message: 'Trips fetched successfully',
+        data: acceptedTrip,
+    });
+});
+
+export const TripController = {requestTrip, findTrips, acceptTrip};
