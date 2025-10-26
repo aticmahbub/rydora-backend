@@ -13,17 +13,17 @@ export interface ITrip {
 
     riderId: Types.ObjectId; // ref → User
     driverId?: Types.ObjectId; // optional until a driver accepts
-    vehicleId?: Types.ObjectId; // useful for analytics later
+    // vehicleId?: Types.ObjectId; // useful for analytics later
 
     // Instead of plain strings, use GeoJSON to support nearby driver queries
     pickupLocation: IGeoPoint;
 
-    dropoffLocation: IGeoPoint;
+    dropoffLocation?: IGeoPoint;
 
-    fare: number;
-    distance: number;
+    fare?: number;
+    distance?: number;
 
-    tripStatus: TripStatus;
+    tripStatus?: TripStatus;
 
     startedAt?: Date;
     completedAt?: Date;

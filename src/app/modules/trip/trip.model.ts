@@ -13,11 +13,11 @@ const tripSchema = new Schema<ITrip>(
             ref: 'Driver',
             default: null,
         },
-        vehicleId: {
-            type: Schema.Types.ObjectId,
-            ref: 'Vehicle',
-            default: null,
-        },
+        // vehicleId: {
+        //     type: Schema.Types.ObjectId,
+        //     ref: 'Vehicle',
+        //     default: null,
+        // },
         pickupLocation: {
             type: {
                 type: String,
@@ -26,7 +26,7 @@ const tripSchema = new Schema<ITrip>(
             },
             coordinates: {
                 type: [Number], // [longitude, latitude]
-                required: true,
+                // required: true,
             },
             address: {type: String},
         },
@@ -38,7 +38,7 @@ const tripSchema = new Schema<ITrip>(
             },
             coordinates: {
                 type: [Number],
-                required: true,
+                // required: true,
             },
             address: {type: String},
         },
