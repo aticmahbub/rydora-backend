@@ -31,7 +31,6 @@ const registerDriver = async (decodedToken: JwtPayload, payload: IDriver) => {
             drivingLicenseNo: payload.drivingLicenseNo,
             currentLocation: user.currentLocation,
         };
-        console.log('cLocation:', driverInfo);
 
         const driver = new Driver(driverInfo);
 

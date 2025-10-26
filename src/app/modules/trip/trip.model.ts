@@ -23,6 +23,7 @@ const tripSchema = new Schema<ITrip>(
                 type: String,
                 enum: ['Point'],
                 default: 'Point',
+                required: true,
             },
             coordinates: {
                 type: [Number],
@@ -35,6 +36,7 @@ const tripSchema = new Schema<ITrip>(
                 type: String,
                 enum: ['Point'],
                 default: 'Point',
+                required: true,
             },
             coordinates: {
                 type: [Number],
@@ -55,6 +57,7 @@ const tripSchema = new Schema<ITrip>(
         tripStatus: {
             type: String,
             enum: Object.values(TripStatus),
+            required: true,
             default: TripStatus.REQUESTED,
         },
         startedAt: {type: Date},

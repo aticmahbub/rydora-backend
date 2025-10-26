@@ -13,12 +13,12 @@ export interface ITrip {
 
     riderId: Types.ObjectId;
     driverId?: Types.ObjectId;
-    // vehicleId?: Types.ObjectId; // useful for analytics later
+    // vehicleId?: Types.ObjectId;
 
     // Instead of plain strings, use GeoJSON to support nearby driver queries
     pickupLocation: IGeoPoint;
 
-    dropoffLocation?: IGeoPoint;
+    dropoffLocation: IGeoPoint;
 
     fare?: number;
     distance?: number;
