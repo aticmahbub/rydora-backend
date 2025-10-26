@@ -12,4 +12,9 @@ router.post(
     checkAuth(Role.DRIVER),
     TripController.acceptTrip,
 );
+router.post(
+    '/cancel/:tripId',
+    checkAuth(Role.RIDER),
+    TripController.cancelTrip,
+);
 export const TripRoutes = router;

@@ -27,6 +27,7 @@ const findTrips = catchAsync(async (req: Request, res: Response) => {
         data: trip,
     });
 });
+
 const acceptTrip = catchAsync(async (req: Request, res: Response) => {
     const tripId = req.params.tripId;
 
@@ -34,9 +35,21 @@ const acceptTrip = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
         success: true,
         statusCode: 201,
-        message: 'Trips fetched successfully',
+        message: 'Trip accepted successfully',
         data: acceptedTrip,
     });
 });
 
-export const TripController = {requestTrip, findTrips, acceptTrip};
+const cancelTrip = catchAsync(async (req: Request, res: Response) => {
+    const tripId = req.params.tripId;
+
+    const acceptedTrip = await TripService.cancelTrip(tripId);
+    sendResponse(res, {
+        success: true,
+        statusCode: 201,
+        message: 'Trip cancelled successfully',
+        data: acceptedTrip,
+    });
+});
+
+export const TripController = {requestTrip, findTrips, acceptTrip, cancelTrip};

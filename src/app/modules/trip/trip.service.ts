@@ -57,4 +57,21 @@ const acceptTrip = async (tripId: string) => {
     return trip;
 };
 
-export const TripService = {requestTrip, findTrips, acceptTrip};
+const cancelTrip = async (tripId: string) => {
+    const trip = await Trip.findById(tripId);
+    if (
+        trip?.tripStatus === TripStatus.ACCEPTED ||
+        trip?.tripStatus === TripStatus.COMPLETED ||
+        trip?.tripStatus === TripStatus.ONGOING
+    ) {
+        throw new AppError(401, 'This trip can not be cancelled');
+    }
+    const updatedDoc = {$set: {tripStatus: TripStatus.CANCELLED}};
+    const updatedTrip = await Trip.findByIdAndUpdate(tripId, updatedDoc, {
+        new: true,
+        runValidators: true,
+    });
+    return updatedTrip;
+};
+
+export const TripService = {requestTrip, findTrips, acceptTrip, cancelTrip};
