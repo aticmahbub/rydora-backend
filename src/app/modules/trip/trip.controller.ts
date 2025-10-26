@@ -6,8 +6,7 @@ import {TripService} from './trip.service';
 const requestTrip = catchAsync(async (req: Request, res: Response) => {
     const decodedToken = req.user;
     const payload = req.body;
-    console.log('Decoded Token:', decodedToken);
-    console.log('Payload received:', payload);
+
     const trip = await TripService.requestTrip(decodedToken, payload);
     sendResponse(res, {
         success: true,
@@ -17,4 +16,16 @@ const requestTrip = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-export const TripController = {requestTrip};
+const findTrips = catchAsync(async (req: Request, res: Response) => {
+    const decodedToken = req.user;
+
+    const trip = await TripService.findTrips(decodedToken);
+    sendResponse(res, {
+        success: true,
+        statusCode: 201,
+        message: 'Trips fetched successfully',
+        data: trip,
+    });
+});
+
+export const TripController = {requestTrip, findTrips};

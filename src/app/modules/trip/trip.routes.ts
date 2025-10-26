@@ -10,4 +10,9 @@ router.post(
     checkAuth(...Object.values(Role)),
     TripController.requestTrip,
 );
+router.get(
+    '/find',
+    checkAuth(...Object.values(Role)),
+    TripController.findTrips,
+);
 export const TripRoutes = router;

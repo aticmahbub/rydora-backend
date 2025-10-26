@@ -6,7 +6,7 @@ const tripSchema = new Schema<ITrip>(
         riderId: {
             type: Schema.Types.ObjectId,
             ref: 'User',
-            //   required: true,
+            required: true,
         },
         driverId: {
             type: Schema.Types.ObjectId,
@@ -25,8 +25,8 @@ const tripSchema = new Schema<ITrip>(
                 default: 'Point',
             },
             coordinates: {
-                type: [Number], // [longitude, latitude]
-                // required: true,
+                type: [Number],
+                required: true,
             },
             address: {type: String},
         },
@@ -38,7 +38,7 @@ const tripSchema = new Schema<ITrip>(
             },
             coordinates: {
                 type: [Number],
-                // required: true,
+                required: true,
             },
             address: {type: String},
         },

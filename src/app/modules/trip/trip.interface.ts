@@ -11,8 +11,8 @@ export enum TripStatus {
 export interface ITrip {
     _id?: Types.ObjectId;
 
-    riderId: Types.ObjectId; // ref → User
-    driverId?: Types.ObjectId; // optional until a driver accepts
+    riderId: Types.ObjectId;
+    driverId?: Types.ObjectId;
     // vehicleId?: Types.ObjectId; // useful for analytics later
 
     // Instead of plain strings, use GeoJSON to support nearby driver queries

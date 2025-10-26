@@ -1,4 +1,5 @@
 import {Types} from 'mongoose';
+import {IGeoPoint} from '../user/user.interface';
 
 export enum DriverApproval {
     PENDING = 'PENDING',
@@ -14,6 +15,8 @@ export enum DriverStatus {
 export interface IDriver {
     userId: Types.ObjectId;
     vehicle: Types.ObjectId;
+
+    currentLocation: IGeoPoint;
 
     driverApproval: DriverApproval;
     driverStatus: DriverStatus;

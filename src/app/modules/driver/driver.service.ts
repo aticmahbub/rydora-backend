@@ -26,11 +26,14 @@ const registerDriver = async (decodedToken: JwtPayload, payload: IDriver) => {
             );
         }
 
-        const driver = new Driver({
+        const driverInfo = {
             userId: user._id,
             drivingLicenseNo: payload.drivingLicenseNo,
-            // currentLocation: user.currentLocation
-        });
+            currentLocation: user.currentLocation,
+        };
+        console.log('cLocation:', driverInfo);
+
+        const driver = new Driver(driverInfo);
 
         await driver.save({session});
 
@@ -40,7 +43,7 @@ const registerDriver = async (decodedToken: JwtPayload, payload: IDriver) => {
         await session.commitTransaction();
         session.endSession();
 
-        return driver;
+        // return driver;
     } catch (error) {
         await session.abortTransaction();
         session.endSession();

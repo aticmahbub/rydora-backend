@@ -36,7 +36,7 @@ export interface IUser {
     age?: number;
     NID: number;
 
-    currentLocation?: IGeoPoint;
+    currentLocation: IGeoPoint;
 
     isDeleted?: boolean;
     isActive?: IsActive;

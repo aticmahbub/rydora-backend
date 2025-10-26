@@ -13,6 +13,20 @@ const driverSchema = new Schema<IDriver>(
         //     ref: 'Vehicle',
         //     // required: true,
         // },
+        currentLocation: {
+            type: {
+                type: String,
+                enum: ['Point'],
+                default: 'Point',
+                required: true,
+            },
+            coordinates: {
+                type: [Number],
+                default: [0, 0],
+            },
+            address: {type: String},
+            updatedAt: {type: Date, default: Date.now},
+        },
         driverApproval: {
             type: String,
             enum: Object.values(DriverApproval),

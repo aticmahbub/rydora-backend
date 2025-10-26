@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {JwtPayload} from 'jsonwebtoken';
-import {ITrip} from './trip.interface';
+import {ITrip, TripStatus} from './trip.interface';
 import {User} from '../user/user.model';
 import {IGeoPoint} from '../user/user.interface';
 import {Trip} from './trip.model';
 import AppError from '../../errorHelpers/AppError';
-// import {Driver} from '../driver/driver.model';
+import {Driver} from '../driver/driver.model';
 
 const requestTrip = async (
     decodedToken: JwtPayload,
@@ -31,4 +31,22 @@ const requestTrip = async (
     return requestedTrip;
 };
 
-export const TripService = {requestTrip};
+const findTrips = async (decodedToken: JwtPayload) => {
+    const driver = await Driver.findById(decodedToken.userId);
+
+    const trip = await Trip.find({
+        tripStatus: TripStatus.REQUESTED,
+        pickupLocation: {
+            $near: {
+                $geometry: {
+                    type: 'Point',
+                    coordinates: driver!.currentLocation.coordinates,
+                },
+                $maxDistance: 30000, // 3 km radius
+            },
+        },
+    });
+    return trip;
+};
+
+export const TripService = {requestTrip, findTrips};
