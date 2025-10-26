@@ -6,6 +6,7 @@ import {DriverService} from './driver.service';
 const registerDriver = catchAsync(async (req: Request, res: Response) => {
     const decodedToken = req.user;
     const payload = req.body;
+
     const driver = await DriverService.registerDriver(decodedToken, payload);
 
     sendResponse(res, {

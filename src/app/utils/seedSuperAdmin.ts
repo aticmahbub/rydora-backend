@@ -16,7 +16,7 @@ export const seedSuperAdmin = async () => {
         console.log('Trying to create super admin...');
 
         const hashedPassword = await bcryptjs.hash(
-            envVars.SUPER_ADMIN_PASSWORD,
+            envVars.SUPER_ADMIN_PASSWORD.trim(),
             Number(envVars.BCRYPTJS_SALT_ROUND),
         );
 
@@ -35,7 +35,7 @@ export const seedSuperAdmin = async () => {
             isVerified: true,
             isNIDVerified: true,
         };
-        const superAdmin = await User.insertOne(payload);
+        const superAdmin = await User.create(payload);
         console.log('Super admin created \n');
         console.log(superAdmin);
     } catch (error) {
