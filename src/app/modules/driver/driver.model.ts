@@ -60,6 +60,7 @@ const driverSchema = new Schema<IDriver>(
     },
     {
         timestamps: true,
+        versionKey: false,
     },
 );
 

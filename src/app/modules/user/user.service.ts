@@ -8,6 +8,10 @@ import {envVars} from '../../config/env.config';
 const createUser = async (payload: Partial<IUser>) => {
     const {email, password, ...rest} = payload;
 
+    if (!email || !password) {
+        throw new AppError(400, 'Email and password are required');
+    }
+
     const isUserExist = await User.findOne({email});
     if (isUserExist) {
         throw new AppError(409, 'User already exist');
@@ -19,14 +23,18 @@ const createUser = async (payload: Partial<IUser>) => {
     };
 
     const hashedPassword = await bcryptjs.hash(password as string, 10);
-    const user = await User.insertOne({
+
+    const user = await User.create({
         email,
         password: hashedPassword,
         auths: [authProvider],
         ...rest,
     });
 
-    return user;
+    const userWithoutPassword = user.toObject();
+    delete userWithoutPassword.password;
+
+    return userWithoutPassword;
 };
 
 const getAllUsers = async () => {
