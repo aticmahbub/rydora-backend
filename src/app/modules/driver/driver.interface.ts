@@ -19,12 +19,6 @@ export interface IDriver {
     driverStatus: DriverStatus;
     drivingLicenseNo: string;
 
-    currentLocation?: {
-        type: 'Point';
-        coordinates: [number, number];
-        updatedAt?: Date;
-    };
-
     rating?: number;
     earnings?: number;
 }

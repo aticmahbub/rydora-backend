@@ -44,12 +44,12 @@ const tripSchema = new Schema<ITrip>(
         },
         fare: {
             type: Number,
-            required: true,
+            // required: true,
             min: 0,
         },
         distance: {
             type: Number,
-            required: true,
+            // required: true,
             min: 0,
         },
         tripStatus: {

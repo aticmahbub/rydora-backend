@@ -1,4 +1,5 @@
 import {Types} from 'mongoose';
+import {IGeoPoint} from '../user/user.interface';
 export enum TripStatus {
     REQUESTED = 'REQUESTED',
     ACCEPTED = 'ACCEPTED',
@@ -15,17 +16,9 @@ export interface ITrip {
     vehicleId?: Types.ObjectId; // useful for analytics later
 
     // Instead of plain strings, use GeoJSON to support nearby driver queries
-    pickupLocation: {
-        type: 'Point';
-        coordinates: [number, number]; // [longitude, latitude]
-        address?: string;
-    };
+    pickupLocation: IGeoPoint;
 
-    dropoffLocation: {
-        type: 'Point';
-        coordinates: [number, number];
-        address?: string;
-    };
+    dropoffLocation: IGeoPoint;
 
     fare: number;
     distance: number;

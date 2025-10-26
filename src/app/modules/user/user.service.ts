@@ -6,6 +6,7 @@ import bcryptjs from 'bcryptjs';
 import {envVars} from '../../config/env.config';
 
 const createUser = async (payload: Partial<IUser>) => {
+    console.log(location);
     const {email, password, ...rest} = payload;
 
     if (!email || !password) {
@@ -30,6 +31,8 @@ const createUser = async (payload: Partial<IUser>) => {
         auths: [authProvider],
         ...rest,
     });
+
+    console.log(location);
 
     const userWithoutPassword = user.toObject();
     delete userWithoutPassword.password;

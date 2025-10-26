@@ -13,6 +13,11 @@ export enum IsActive {
     BLOCKED = 'BLOCKED',
 }
 
+export interface IGeoPoint {
+    type: 'Point';
+    coordinates: [number, number];
+    address?: string;
+}
 export interface IAuthProvider {
     provider: 'google' | 'credentials';
     providerId: string;
@@ -31,7 +36,7 @@ export interface IUser {
     age?: number;
     NID: number;
 
-    currentLocation?: string;
+    currentLocation?: IGeoPoint;
 
     isDeleted?: boolean;
     isActive?: IsActive;
