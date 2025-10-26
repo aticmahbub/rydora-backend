@@ -1,18 +1,27 @@
 import z from 'zod';
 import {IsActive, Role} from './user.interface';
 
+export const geoPointZodSchema = z.object({
+    type: z.literal('Point'),
+    coordinates: z.tuple([z.number(), z.number()], {
+        message: 'Coordinates must be an array of [longitude, latitude]',
+    }),
+    address: z.string().max(200).optional(),
+    updatedAt: z.date().optional(),
+});
+
 export const createUserZodSchema = z.object({
     name: z
-        .string({error: 'Name must be string'})
-        .min(2, {error: 'Name must be 2 characters long'})
-        .max(20, {error: 'Name can not exceed 20 characters'}),
-    email: z.email({error: 'Invalid email'}),
+        .string({message: 'Name must be string'})
+        .min(2, {message: 'Name must be at least 2 characters long'})
+        .max(20, {message: 'Name cannot exceed 20 characters'}),
+    email: z.string().email({message: 'Invalid email'}),
     password: z
-        .string({error: 'Password must be string'})
+        .string({message: 'Password must be string'})
         .min(8)
         .max(20)
         .regex(/^(?=.*[A-Z])/, {
-            message: 'Password must contain at least 1 uppercase letter.',
+            message: 'Password must contain at least 1 uppercase letter',
         })
         .regex(/^(?=.*[!@#$%^&*])/, {
             message: 'Password must contain at least one special character',
@@ -21,27 +30,30 @@ export const createUserZodSchema = z.object({
             message: 'Password must contain at least one number',
         }),
     phone: z
-        .string({error: 'Phone number must be string'})
+        .string({message: 'Phone number must be string'})
         .regex(/^(?:\+8801\d{9})$/)
         .optional(),
-    address: z
-        .string({message: 'Address must string'})
-        .max(200, {message: 'Address can not exceed 200 characters'})
-        .optional(),
     NID: z.number(),
+    age: z.number().optional(),
+    isNIDVerified: z.boolean().optional(),
+    currentLocation: geoPointZodSchema,
+    role: z.enum(Object.values(Role)).optional(),
+    isActive: z.enum(Object.values(IsActive)).optional(),
+    isVerified: z.boolean().optional(),
 });
+
 export const updateUserZodSchema = z.object({
     name: z
-        .string({error: 'Name must be string'})
-        .min(2, {error: 'Name must be 2 characters long'})
-        .max(20, {error: 'Name can not exceed 20 characters'})
+        .string()
+        .min(2, {message: 'Name must be at least 2 characters long'})
+        .max(20, {message: 'Name cannot exceed 20 characters'})
         .optional(),
     password: z
-        .string({error: 'Password must be string'})
+        .string()
         .min(8)
         .max(20)
         .regex(/^(?=.*[A-Z])/, {
-            message: 'Password must contain at least 1 uppercase letter.',
+            message: 'Password must contain at least 1 uppercase letter',
         })
         .regex(/^(?=.*[!@#$%^&*])/, {
             message: 'Password must contain at least one special character',
@@ -50,17 +62,16 @@ export const updateUserZodSchema = z.object({
             message: 'Password must contain at least one number',
         })
         .optional(),
-    role: z.enum(Object.values(Role)),
     phone: z
-        .string({error: 'Phone number must be string'})
+        .string()
         .regex(/^(?:\+8801\d{9})$/)
         .optional(),
-    address: z
-        .string({message: 'Address must string'})
-        .max(200, {message: 'Address can not exceed 200 characters'})
-        .optional(),
-    isDeleted: z.boolean().optional(),
-    isActive: z.enum(Object.values(IsActive)),
-    isVerified: z.boolean().optional(),
+    NID: z.number().optional(),
+    age: z.number().optional(),
     isNIDVerified: z.boolean().optional(),
+    currentLocation: geoPointZodSchema.optional(),
+    role: z.enum(Object.values(Role)).optional(),
+    isDeleted: z.boolean().optional(),
+    isActive: z.enum(Object.values(IsActive)).optional(),
+    isVerified: z.boolean().optional(),
 });

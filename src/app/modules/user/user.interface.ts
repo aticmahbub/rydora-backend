@@ -41,7 +41,6 @@ export interface IUser {
     isDeleted?: boolean;
     isActive?: IsActive;
     isVerified?: boolean;
-    isNIDVerified?: boolean;
 
     auths: IAuthProvider[];
 }

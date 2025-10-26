@@ -29,9 +29,7 @@ const registerDriver = async (decodedToken: JwtPayload, payload: IDriver) => {
         const driver = new Driver({
             userId: user._id,
             drivingLicenseNo: payload.drivingLicenseNo,
-            currentLocation: payload.currentLocation,
-            driverApproval: payload.driverApproval,
-            driverStatus: payload.driverStatus,
+            // currentLocation: user.currentLocation
         });
 
         await driver.save({session});
@@ -50,22 +48,4 @@ const registerDriver = async (decodedToken: JwtPayload, payload: IDriver) => {
     }
 };
 
-// const registerDriver = async (decodedToken: JwtPayload, payload: IDriver) => {
-//     const user = await User.findById(decodedToken.userId);
-//     if (!user) {
-//         throw new AppError(404, 'User does not exist');
-//     }
-
-//     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-//     user!.role = Role.DRIVER;
-//     await user.save();
-
-//     const driver = new Driver({
-//         userId: user._id,
-//         drivingLicenseNo: payload.drivingLicenseNo,
-//         currentLocation: payload.currentLocation,
-//     });
-
-//     await driver.save();
-// };
 export const DriverService = {registerDriver};

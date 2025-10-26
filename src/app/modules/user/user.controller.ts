@@ -4,9 +4,7 @@ import {catchAsync} from '../../utils/catchAsync';
 import {sendResponse} from '../../utils/sendResponse';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
-    // const location = getLocationFromIP(req);
     const result = await UserService.createUser(req.body);
-
     sendResponse(res, {
         statusCode: 201,
         success: true,

@@ -8,11 +8,11 @@ const driverSchema = new Schema<IDriver>(
             ref: 'User',
             // required: true,
         },
-        vehicle: {
-            type: Schema.Types.ObjectId,
-            ref: 'Vehicle',
-            // required: true,
-        },
+        // vehicle: {
+        //     type: Schema.Types.ObjectId,
+        //     ref: 'Vehicle',
+        //     // required: true,
+        // },
         driverApproval: {
             type: String,
             enum: Object.values(DriverApproval),
@@ -31,21 +31,7 @@ const driverSchema = new Schema<IDriver>(
             trim: true,
             unique: true,
         },
-        currentLocation: {
-            type: {
-                type: String,
-                enum: ['Point'],
-                default: 'Point',
-            },
-            coordinates: {
-                type: [Number],
-                default: [0, 0],
-            },
-            updatedAt: {
-                type: Date,
-                default: Date.now,
-            },
-        },
+
         rating: {
             type: Number,
             default: 0,
@@ -63,8 +49,5 @@ const driverSchema = new Schema<IDriver>(
         versionKey: false,
     },
 );
-
-// ✅ GeoJSON index for location-based queries
-driverSchema.index({currentLocation: '2dsphere'});
 
 export const Driver = model<IDriver>('Driver', driverSchema);

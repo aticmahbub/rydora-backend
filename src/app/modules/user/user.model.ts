@@ -24,13 +24,24 @@ const userSchema = new Schema<IUser>(
         },
         age: {type: Number},
         NID: {type: Number, required: true, unique: true},
-        isNIDVerified: {type: Boolean},
 
-        currentLocation: {type: String},
+        currentLocation: {
+            type: {
+                type: String,
+                enum: ['Point'],
+                default: 'Point',
+                required: true,
+            },
+            coordinates: {
+                type: [Number],
+                default: [0, 0],
+            },
+            address: {type: String},
+            updatedAt: {type: Date, default: Date.now},
+        },
 
         phone: {type: String},
         picture: {type: String},
-        address: {type: String},
         isDeleted: {type: Boolean, default: false},
         isActive: {
             type: String,
@@ -42,5 +53,6 @@ const userSchema = new Schema<IUser>(
     },
     {timestamps: true, versionKey: false},
 );
-
+// ✅ GeoJSON index for location-based queries
+userSchema.index({currentLocation: '2dsphere'});
 export const User = model<IUser>('User', userSchema);
