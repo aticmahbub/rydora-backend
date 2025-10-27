@@ -1,5 +1,5 @@
 {
-  "name": "rydora-backend",
+  "name": "rydora-backend", 
   "version": "1.0.0",
   "description": "The core API and matching engine powering Rydora — built with TypeScript, Express, and MongoDB.",
   "main": "server.js",
