@@ -94,4 +94,8 @@ const updateUser = async (
     return updatedUser;
 };
 
-export const UserService = {createUser, getAllUsers, updateUser};
+const getUserInfo = async (userId: string) => {
+    const user = await User.findById(userId).select('-password');
+    return {data: user};
+};
+export const UserService = {createUser, getAllUsers, updateUser, getUserInfo};

@@ -25,4 +25,10 @@ router.patch(
     checkAuth(...Object.values(Role)),
     UserController.updateUser,
 );
+
+router.get(
+    '/info',
+    checkAuth(...Object.values(Role)),
+    UserController.getUserInfo,
+);
 export const UserRoutes = router;

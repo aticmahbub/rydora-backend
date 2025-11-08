@@ -2,6 +2,7 @@ import {Request, Response} from 'express';
 import {UserService} from './user.service';
 import {catchAsync} from '../../utils/catchAsync';
 import {sendResponse} from '../../utils/sendResponse';
+import {JwtPayload} from 'jsonwebtoken';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
     const result = await UserService.createUser(req.body);
@@ -22,6 +23,18 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
         message: 'Users retrieved successfully',
         data: result.data,
         meta: result.meta,
+    });
+});
+
+const getUserInfo = catchAsync(async (req: Request, res: Response) => {
+    const decodedToken = req.user as JwtPayload;
+    const result = await UserService.getUserInfo(decodedToken.userId);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: 'User retrieved successfully',
+        data: result.data,
     });
 });
 // const getAllUsers = catchAsync(async (req: Request, res: Response) => {
@@ -54,4 +67,9 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
         data: updatedUser,
     });
 });
-export const UserController = {createUser, getAllUsers, updateUser};
+export const UserController = {
+    createUser,
+    getAllUsers,
+    updateUser,
+    getUserInfo,
+};
