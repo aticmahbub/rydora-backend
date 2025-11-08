@@ -1,5 +1,5 @@
 {
-  "name": "rydora-backend", 
+  "name": "rydora-backend",
   "version": "1.0.0",
   "description": "The core API and matching engine powering Rydora — built with TypeScript, Express, and MongoDB.",
   "main": "server.js",
@@ -16,6 +16,7 @@
   "devDependencies": {
     "@eslint/js": "^9.37.0",
     "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/geoip-lite": "^1.4.4",
     "@types/jsonwebtoken": "^9.0.10",

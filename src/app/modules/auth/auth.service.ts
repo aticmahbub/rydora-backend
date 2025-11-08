@@ -4,7 +4,7 @@ import {
     createAccessTokenWithRefreshToken,
     createUserTokens,
 } from '../../utils/userTokens';
-import {IUser} from '../user/user.interface';
+import {IsActive, IUser} from '../user/user.interface';
 import {User} from '../user/user.model';
 import bcryptjs from 'bcryptjs';
 import {envVars} from '../../config/env.config';
@@ -24,7 +24,18 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
     if (!isPasswordMatched) {
         throw new AppError(401, 'Password is not matched');
     }
-
+    if (!isUserExist.isVerified) {
+        throw new AppError(401, 'User is not verified');
+    }
+    if (
+        isUserExist.isActive === IsActive.BLOCKED ||
+        isUserExist.isActive === IsActive.INACTIVE
+    ) {
+        throw new AppError(403, `User is ${isUserExist.isActive}`);
+    }
+    if (isUserExist.isDeleted) {
+        throw new AppError(410, 'User is deleted');
+    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {password: pass, ...rest} = isUserExist.toObject();
 

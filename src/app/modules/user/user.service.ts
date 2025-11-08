@@ -55,7 +55,7 @@ const updateUser = async (
     }
 
     if (isUserExist.isDeleted || isUserExist.isActive === IsActive.BLOCKED) {
-        throw new AppError(403, 'Forbidden. Forbidden. User is not allowed.');
+        throw new AppError(403, 'Forbidden. User is not allowed.');
     }
     if (payload.role === Role.DRIVER || payload.role === Role.RIDER) {
         throw new AppError(403, 'Forbidden. User is not allowed.');
