@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 import app from './app';
 import {envVars} from './app/config/env.config';
 import {seedSuperAdmin} from './app/utils/seedSuperAdmin';
+import fs from 'fs';
+import https from 'https';
 
 let server: Server;
 
@@ -31,8 +33,11 @@ const startServer = async () => {
     try {
         await connectDB();
         const port = envVars.PORT || 4000;
-        server = app.listen(port, () => {
-            console.log(`server is listening on port: ${port}`);
+        const key = fs.readFileSync('./localhost-key.pem');
+        const cert = fs.readFileSync('./localhost.pem');
+
+        server = https.createServer({key, cert}, app).listen(port, () => {
+            console.log('Backend running on https://localhost:3000');
         });
     } catch (error) {
         console.log(error);

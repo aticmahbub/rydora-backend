@@ -9,12 +9,14 @@ export const setAuthCookie = (res: Response, tokenInfo: IAuthInterface) => {
         res.cookie('accessToken', tokenInfo.accessToken, {
             httpOnly: true,
             secure: true,
+            sameSite: 'none',
         });
     }
     if (tokenInfo.refreshToken) {
         res.cookie('refreshToken', tokenInfo.refreshToken, {
             httpOnly: true,
             secure: true,
+            sameSite: 'none',
         });
     }
 };
