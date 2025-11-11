@@ -1,7 +1,7 @@
 import {model, Schema} from 'mongoose';
-import {ITrip, TripStatus} from './trip.interface';
+import {IRide, RideStatus} from './ride.interface';
 
-const tripSchema = new Schema<ITrip>(
+const rideSchema = new Schema<IRide>(
     {
         riderId: {
             type: Schema.Types.ObjectId,
@@ -54,11 +54,11 @@ const tripSchema = new Schema<ITrip>(
             // required: true,
             min: 0,
         },
-        tripStatus: {
+        rideStatus: {
             type: String,
-            enum: Object.values(TripStatus),
+            enum: Object.values(RideStatus),
             required: true,
-            default: TripStatus.REQUESTED,
+            default: RideStatus.REQUESTED,
         },
         startedAt: {type: Date},
         completedAt: {type: Date},
@@ -79,20 +79,20 @@ const tripSchema = new Schema<ITrip>(
 );
 
 // ✅ Geospatial index for proximity queries
-tripSchema.index({pickupLocation: '2dsphere'});
-tripSchema.index({dropoffLocation: '2dsphere'});
+rideSchema.index({pickupLocation: '2dsphere'});
+rideSchema.index({dropoffLocation: '2dsphere'});
 
 // Optional: hook to auto-update status timestamps
-tripSchema.pre('save', function (next) {
-    if (this.isModified('tripStatus')) {
-        if (this.tripStatus === TripStatus.ONGOING) {
+rideSchema.pre('save', function (next) {
+    if (this.isModified('rideStatus')) {
+        if (this.rideStatus === RideStatus.ONGOING) {
             this.startedAt = new Date();
         }
-        if (this.tripStatus === TripStatus.COMPLETED) {
+        if (this.rideStatus === RideStatus.COMPLETED) {
             this.completedAt = new Date();
         }
     }
     next();
 });
 
-export const Trip = model<ITrip>('Trip', tripSchema);
+export const Ride = model<IRide>('Ride', rideSchema);

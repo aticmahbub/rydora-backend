@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {JwtPayload} from 'jsonwebtoken';
-import {ITrip, TripStatus} from './trip.interface';
+import {IRide, RideStatus} from './ride.interface';
 import {User} from '../user/user.model';
 import {IGeoPoint} from '../user/user.interface';
-import {Trip} from './trip.model';
+import {Ride} from './ride.model';
 import AppError from '../../errorHelpers/AppError';
 
-const requestTrip = async (
+const requestRide = async (
     decodedToken: JwtPayload,
-    payload: Partial<ITrip>,
+    payload: Partial<IRide>,
 ) => {
     const rider = await User.findById(decodedToken.userId);
     if (!rider || !rider.currentLocation) {
@@ -19,22 +19,22 @@ const requestTrip = async (
         throw new AppError(400, 'Dropoff location is required');
     }
 
-    const trip: ITrip = {
+    const ride: IRide = {
         riderId: rider._id,
         pickupLocation: rider.currentLocation as IGeoPoint,
         dropoffLocation: payload.dropoffLocation,
         fare: payload.fare,
     };
 
-    const requestedTrip = await Trip.create(trip);
-    return requestedTrip;
+    const requestedRide = await Ride.create(ride);
+    return requestedRide;
 };
 
-const findTrips = async (decodedToken: JwtPayload) => {
+const findRides = async (decodedToken: JwtPayload) => {
     const driver = await User.findById(decodedToken.userId);
 
-    const trip = await Trip.find({
-        tripStatus: TripStatus.REQUESTED,
+    const ride = await Ride.find({
+        rideStatus: RideStatus.REQUESTED,
         pickupLocation: {
             $near: {
                 $geometry: {
@@ -45,33 +45,33 @@ const findTrips = async (decodedToken: JwtPayload) => {
             },
         },
     });
-    return trip;
+    return ride;
 };
 
-const acceptTrip = async (tripId: string) => {
-    const updatedDoc = {$set: {tripStatus: TripStatus.ACCEPTED}};
-    const trip = await Trip.findByIdAndUpdate(tripId, updatedDoc, {
+const acceptRide = async (rideId: string) => {
+    const updatedDoc = {$set: {rideStatus: RideStatus.ACCEPTED}};
+    const ride = await Ride.findByIdAndUpdate(rideId, updatedDoc, {
         new: true,
         runValidators: true,
     });
-    return trip;
+    return ride;
 };
 
-const cancelTrip = async (tripId: string) => {
-    const trip = await Trip.findById(tripId);
+const cancelRide = async (rideId: string) => {
+    const ride = await Ride.findById(rideId);
     if (
-        trip?.tripStatus === TripStatus.ACCEPTED ||
-        trip?.tripStatus === TripStatus.COMPLETED ||
-        trip?.tripStatus === TripStatus.ONGOING
+        ride?.rideStatus === RideStatus.ACCEPTED ||
+        ride?.rideStatus === RideStatus.COMPLETED ||
+        ride?.rideStatus === RideStatus.ONGOING
     ) {
-        throw new AppError(401, 'This trip can not be cancelled');
+        throw new AppError(401, 'This ride can not be cancelled');
     }
-    const updatedDoc = {$set: {tripStatus: TripStatus.CANCELLED}};
-    const updatedTrip = await Trip.findByIdAndUpdate(tripId, updatedDoc, {
+    const updatedDoc = {$set: {rideStatus: RideStatus.CANCELLED}};
+    const updatedRide = await Ride.findByIdAndUpdate(rideId, updatedDoc, {
         new: true,
         runValidators: true,
     });
-    return updatedTrip;
+    return updatedRide;
 };
 
-export const TripService = {requestTrip, findTrips, acceptTrip, cancelTrip};
+export const RideService = {requestRide, findRides, acceptRide, cancelRide};

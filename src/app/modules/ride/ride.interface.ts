@@ -1,6 +1,6 @@
 import {Types} from 'mongoose';
 import {IGeoPoint} from '../user/user.interface';
-export enum TripStatus {
+export enum RideStatus {
     REQUESTED = 'REQUESTED',
     ACCEPTED = 'ACCEPTED',
     ONGOING = 'ONGOING',
@@ -8,7 +8,7 @@ export enum TripStatus {
     CANCELLED = 'CANCELLED',
 }
 
-export interface ITrip {
+export interface IRide {
     _id?: Types.ObjectId;
 
     riderId: Types.ObjectId;
@@ -23,7 +23,7 @@ export interface ITrip {
     fare?: number;
     distance?: number;
 
-    tripStatus?: TripStatus;
+    rideStatus?: RideStatus;
 
     startedAt?: Date;
     completedAt?: Date;

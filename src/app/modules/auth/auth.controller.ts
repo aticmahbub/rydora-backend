@@ -34,8 +34,21 @@ const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+    const decodedToken = req.user;
+    const oldPassword = req.body.oldPassword;
+    const newPassword = req.body.newPassword;
+
+    await AuthService.resetPassword(oldPassword, newPassword, decodedToken);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Password is changed successfully',
+        data: null,
+    });
+});
 const logout = catchAsync(async (req: Request, res: Response) => {
-    // const accessToken = req.headers.cookie;
+    // const accessToken = req.headers.cookie ||req.cookies.accessToken;
 
     res.clearCookie('accessToken', {
         httpOnly: true,
@@ -51,20 +64,6 @@ const logout = catchAsync(async (req: Request, res: Response) => {
         statusCode: 200,
         success: true,
         message: 'User logged out successfully',
-        data: null,
-    });
-});
-
-const resetPassword = catchAsync(async (req: Request, res: Response) => {
-    const decodedToken = req.user;
-    const oldPassword = req.body.oldPassword;
-    const newPassword = req.body.newPassword;
-
-    await AuthService.resetPassword(oldPassword, newPassword, decodedToken);
-    sendResponse(res, {
-        statusCode: 200,
-        success: true,
-        message: 'Password is changed successfully',
         data: null,
     });
 });
