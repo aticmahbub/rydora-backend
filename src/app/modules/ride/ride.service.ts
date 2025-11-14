@@ -2,7 +2,6 @@
 import {JwtPayload} from 'jsonwebtoken';
 import {IRide, RideStatus} from './ride.interface';
 import {User} from '../user/user.model';
-import {IGeoPoint} from '../user/user.interface';
 import {Ride} from './ride.model';
 import AppError from '../../errorHelpers/AppError';
 
@@ -11,17 +10,22 @@ const requestRide = async (
     payload: Partial<IRide>,
 ) => {
     const rider = await User.findById(decodedToken.userId);
-    if (!rider || !rider.currentLocation) {
-        throw new AppError(400, 'Rider current location is missing');
+    if (!rider) {
+        throw new AppError(400, 'Rider is missing');
     }
 
-    if (!payload.dropoffLocation || !payload.dropoffLocation.coordinates) {
-        throw new AppError(400, 'Dropoff location is required');
+    if (
+        !payload.dropoffLocation ||
+        !payload.dropoffLocation.coordinates ||
+        !payload.pickupLocation ||
+        !payload.pickupLocation.coordinates
+    ) {
+        throw new AppError(400, 'Dropoff or Pickup location is required');
     }
 
     const ride: IRide = {
         riderId: rider._id,
-        pickupLocation: rider.currentLocation as IGeoPoint,
+        pickupLocation: payload.pickupLocation,
         dropoffLocation: payload.dropoffLocation,
         fare: payload.fare,
     };
@@ -31,23 +35,30 @@ const requestRide = async (
 };
 
 const findRides = async (decodedToken: JwtPayload) => {
-    const driver = await User.findById(decodedToken.userId);
+    const user = await User.findById(decodedToken.userId);
 
-    const ride = await Ride.find({
-        rideStatus: RideStatus.REQUESTED,
+    if (!user || !user.currentLocation?.coordinates) {
+        throw new Error('User not found or location not set');
+    }
+
+    const rides = await Ride.find({
+        rideStatus: 'REQUESTED',
         pickupLocation: {
             $near: {
                 $geometry: {
                     type: 'Point',
-                    coordinates: driver!.currentLocation.coordinates,
+                    coordinates: user.currentLocation.coordinates,
                 },
-                $maxDistance: 30000,
+                $maxDistance: 2000000,
             },
         },
-    });
-    return ride;
-};
+    })
+        .sort({createdAt: -1})
+        .populate('riderId', 'name phone rating') // Populate rider details
+        .limit(50); // Limit results
 
+    return rides;
+};
 const acceptRide = async (rideId: string) => {
     const updatedDoc = {$set: {rideStatus: RideStatus.ACCEPTED}};
     const ride = await Ride.findByIdAndUpdate(rideId, updatedDoc, {

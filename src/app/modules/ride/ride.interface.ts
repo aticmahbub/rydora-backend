@@ -1,11 +1,16 @@
 import {Types} from 'mongoose';
-import {IGeoPoint} from '../user/user.interface';
 export enum RideStatus {
     REQUESTED = 'REQUESTED',
     ACCEPTED = 'ACCEPTED',
     ONGOING = 'ONGOING',
     COMPLETED = 'COMPLETED',
     CANCELLED = 'CANCELLED',
+}
+
+export interface IGeoPoint {
+    type: 'Point';
+    coordinates: [number, number];
+    address?: string;
 }
 
 export interface IRide {

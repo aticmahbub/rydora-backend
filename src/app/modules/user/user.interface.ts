@@ -1,4 +1,5 @@
 import {Types} from 'mongoose';
+import {IGeoPoint} from '../ride/ride.interface';
 
 export enum Role {
     SUPER_ADMIN = 'SUPER_ADMIN',
@@ -13,11 +14,6 @@ export enum IsActive {
     BLOCKED = 'BLOCKED',
 }
 
-export interface IGeoPoint {
-    type: 'Point';
-    coordinates: [number, number];
-    address?: string;
-}
 export interface IAuthProvider {
     provider: 'google' | 'credentials';
     providerId: string;
