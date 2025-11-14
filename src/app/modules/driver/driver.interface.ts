@@ -1,5 +1,5 @@
 import {Types} from 'mongoose';
-import {IGeoPoint} from '../user/user.interface';
+import {IGeoPoint} from '../ride/ride.interface';
 
 export enum DriverApproval {
     PENDING = 'PENDING',
@@ -24,4 +24,24 @@ export interface IDriver {
 
     rating?: number;
     earnings?: number;
+}
+
+export interface DriverRegistrationPayload {
+    drivingLicenseNo: string;
+    vehicle?: {
+        registrationNo: string;
+        vehicleType: string;
+        brand: string;
+        model: string;
+        color: string;
+        manufacturingYear: number;
+        capacity: number;
+        registrationCard: string;
+        insurance: {
+            provider: string;
+            policyNo: string;
+            expiryDate: string;
+            document: string;
+        };
+    };
 }
