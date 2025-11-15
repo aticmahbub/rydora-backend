@@ -8,11 +8,11 @@ const driverSchema = new Schema<IDriver>(
             ref: 'User',
             // required: true,
         },
-        // vehicle: {
-        //     type: Schema.Types.ObjectId,
-        //     ref: 'Vehicle',
-        //     // required: true,
-        // },
+        vehicle: {
+            type: Schema.Types.ObjectId,
+            ref: 'Vehicle',
+            // required: true,
+        },
         currentLocation: {
             type: {
                 type: String,

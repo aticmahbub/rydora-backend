@@ -37,17 +37,6 @@ const getUserInfo = catchAsync(async (req: Request, res: Response) => {
         data: result.data,
     });
 });
-// const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-//     const result = await UserService.getAllUsers();
-
-//     sendResponse(res, {
-//         statusCode: 200,
-//         success: true,
-//         message: 'Users retrieved successfully',
-//         data: result.data,
-//         meta: result.meta,
-//     });
-// });
 
 const updateUser = catchAsync(async (req: Request, res: Response) => {
     const userId = req.params.id;

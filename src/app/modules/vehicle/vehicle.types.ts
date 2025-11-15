@@ -15,15 +15,9 @@ export interface IVehicle {
     brand: string;
     model: string;
     color: string;
-    manufacturingYear: number;
+
     capacity: number;
-    registrationCard: string;
-    insurance: {
-        provider: string;
-        policyNo: string;
-        expiryDate: Date;
-        document: string;
-    };
+    // registrationCard: string;
     createdAt?: Date;
     updatedAt?: Date;
 }

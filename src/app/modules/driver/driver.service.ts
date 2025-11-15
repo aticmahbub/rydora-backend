@@ -77,15 +77,8 @@ const registerDriver = async (
             brand: vehicle.brand,
             model: vehicle.model,
             color: vehicle.color,
-            manufacturingYear: vehicle.manufacturingYear,
             capacity: vehicle.capacity,
-            registrationCard: vehicle.registrationCard || '',
-            insurance: {
-                provider: vehicle.insurance.provider,
-                policyNo: vehicle.insurance.policyNo,
-                expiryDate: new Date(vehicle.insurance.expiryDate),
-                document: vehicle.insurance.document || '',
-            },
+            // registrationCard: vehicle.registrationCard || '',
         };
 
         const newVehicle = new Vehicle(vehicleInfo);
@@ -115,7 +108,6 @@ const registerDriver = async (
         await session.commitTransaction();
         session.endSession();
 
-        // Return just the data, let controller handle response structure
         return {
             driver: {
                 _id: driver._id,

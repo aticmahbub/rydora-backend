@@ -28,13 +28,59 @@ const findRides = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-const acceptRide = catchAsync(async (req: Request, res: Response) => {
-    const rideId = req.params.rideId;
+// Ride details
+const getRideDetails = catchAsync(async (req: Request, res: Response) => {
+    const decodedToken = req.user;
+    const {rideId} = req.params;
 
-    const acceptedRide = await RideService.acceptRide(rideId);
+    const ride = await RideService.getRideDetails(rideId, decodedToken);
+
     sendResponse(res, {
         success: true,
-        statusCode: 201,
+        statusCode: 200,
+        message: 'Ride details fetched successfully',
+        data: ride,
+    });
+});
+
+//  paginated ride history with filters
+
+const getRideHistory = catchAsync(async (req: Request, res: Response) => {
+    const decodedToken = req.user;
+    const filters = req.query;
+
+    const result = await RideService.getRideHistory(decodedToken, filters);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: 'Ride history fetched successfully',
+        data: result,
+    });
+});
+
+// ride statistics
+
+const getRideStats = catchAsync(async (req: Request, res: Response) => {
+    const decodedToken = req.user;
+
+    const stats = await RideService.getRideStats(decodedToken);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: 'Ride statistics fetched successfully',
+        data: stats,
+    });
+});
+
+const acceptRide = catchAsync(async (req: Request, res: Response) => {
+    const rideId = req.params.rideId;
+    const decodedToken = req.user; // Add this line
+    const acceptedRide = await RideService.acceptRide(rideId, decodedToken); // Pass both arguments
+    sendResponse(res, {
+        success: true,
+        statusCode: 200,
         message: 'Ride accepted successfully',
         data: acceptedRide,
     });
@@ -42,14 +88,22 @@ const acceptRide = catchAsync(async (req: Request, res: Response) => {
 
 const cancelRide = catchAsync(async (req: Request, res: Response) => {
     const rideId = req.params.rideId;
-
-    const acceptedRide = await RideService.cancelRide(rideId);
+    const decodedToken = req.user; // Add this line
+    const cancelledRide = await RideService.cancelRide(rideId, decodedToken); // Pass both arguments
     sendResponse(res, {
         success: true,
-        statusCode: 201,
+        statusCode: 200,
         message: 'Ride cancelled successfully',
-        data: acceptedRide,
+        data: cancelledRide,
     });
 });
 
-export const RideController = {requestRide, findRides, acceptRide, cancelRide};
+export const RideController = {
+    requestRide,
+    getRideDetails,
+    findRides,
+    acceptRide,
+    cancelRide,
+    getRideStats,
+    getRideHistory,
+};

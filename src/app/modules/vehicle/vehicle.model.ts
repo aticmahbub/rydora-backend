@@ -32,40 +32,16 @@ const vehicleSchema = new Schema<IVehicle>(
             required: true,
             trim: true,
         },
-        manufacturingYear: {
-            type: Number,
-            required: true,
-            min: 1990,
-            max: new Date().getFullYear() + 1,
-        },
         capacity: {
             type: Number,
             required: true,
             min: 1,
             max: 20,
         },
-        registrationCard: {
-            type: String,
-            required: true, // URL to uploaded document
-        },
-        insurance: {
-            provider: {
-                type: String,
-                required: true,
-            },
-            policyNo: {
-                type: String,
-                required: true,
-            },
-            expiryDate: {
-                type: Date,
-                required: true,
-            },
-            document: {
-                type: String,
-                required: true, // URL to uploaded document
-            },
-        },
+        // registrationCard: {
+        //     type: String,
+        //     required: true, // URL to uploaded document
+        // },
     },
     {
         timestamps: true,

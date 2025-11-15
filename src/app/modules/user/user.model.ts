@@ -53,6 +53,6 @@ const userSchema = new Schema<IUser>(
     },
     {timestamps: true, versionKey: false},
 );
-// ✅ GeoJSON index for location-based queries
+// GeoJSON index for location-based queries
 userSchema.index({currentLocation: '2dsphere'});
 export const User = model<IUser>('User', userSchema);
