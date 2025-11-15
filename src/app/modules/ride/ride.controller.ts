@@ -30,8 +30,8 @@ const findRides = catchAsync(async (req: Request, res: Response) => {
 
 // Ride details
 const getRideDetails = catchAsync(async (req: Request, res: Response) => {
-    const decodedToken = req.user;
     const {rideId} = req.params;
+    const decodedToken = req.user;
 
     const ride = await RideService.getRideDetails(rideId, decodedToken);
 
@@ -44,7 +44,6 @@ const getRideDetails = catchAsync(async (req: Request, res: Response) => {
 });
 
 //  paginated ride history with filters
-
 const getRideHistory = catchAsync(async (req: Request, res: Response) => {
     const decodedToken = req.user;
     const filters = req.query;

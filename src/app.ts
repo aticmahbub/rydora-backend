@@ -12,34 +12,16 @@ app.use(express.urlencoded({extended: true, limit: '10mb'}));
 app.use(cookieParser());
 app.use(
     cors({
-        origin: [
-            // 'http://localhost:5173',
-            'https://localhost:5173',
-        ],
+        origin: ['https://rydora-frontend.vercel.app', 'http://localhost:5173'],
         credentials: true,
     }),
 );
+
 app.use('/api/v1', router);
-
-router.post('/test-body', (req, res) => {
-    console.log('=== TEST BODY ENDPOINT ===');
-    console.log('Headers:', req.headers);
-    console.log('Content-Type:', req.get('Content-Type'));
-    console.log('Request Body:', req.body);
-    console.log('Body Type:', typeof req.body);
-    console.log('Body Keys:', Object.keys(req.body || {}));
-    console.log('========================');
-
-    res.json({
-        success: true,
-        message: 'Body received successfully',
-        receivedBody: req.body,
-        headers: req.headers,
-    });
-});
-
 app.get('/', (req: Request, res: Response) => {
-    res.status(200).json({message: 'Rydora backend is up and running'});
+    res.status(200).json({
+        message: 'Rydora backend is up and running on server',
+    });
 });
 
 app.use(globalErrorHandler);

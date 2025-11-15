@@ -26,6 +26,7 @@ export const seedSuperAdmin = async () => {
         };
 
         const payload: IUser = {
+            currentLocation: {type: 'Point', coordinates: [0, 0], address: ''},
             name: 'Super Admin',
             email: envVars.SUPER_ADMIN_EMAIL,
             password: hashedPassword,
@@ -33,7 +34,6 @@ export const seedSuperAdmin = async () => {
             auths: [authProvider],
             NID: 1234567890,
             isVerified: true,
-            isNIDVerified: true,
         };
         const superAdmin = await User.create(payload);
         console.log('Super admin created \n');

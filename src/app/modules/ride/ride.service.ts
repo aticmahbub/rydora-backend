@@ -72,23 +72,36 @@ const findRides = async (decodedToken: JwtPayload) => {
     return rides;
 };
 
-const getRideDetails = async (rideId: string, decodedToken: JwtPayload) => {
+const getRideDetails = async (
+    rideId: string,
+    decodedToken: JwtPayload,
+): Promise<IRide> => {
+    const user = await User.findById(decodedToken.userId);
+    if (!user) {
+        throw new AppError(404, 'User not found');
+    }
+
     const ride = await Ride.findById(rideId)
-        .populate('riderId', 'name phone rating')
-        .populate('driverId', 'name phone rating');
+        .populate('riderId', 'name phone email')
+        .populate('driverId', 'name phone rating totalRides vehicle')
+        .lean();
 
     if (!ride) {
         throw new AppError(404, 'Ride not found');
     }
 
     // Check if user has permission to view this ride
-    const isRider =
-        (ride.riderId as any)._id.toString() === decodedToken.userId;
-    const isDriver =
-        ride.driverId &&
-        (ride.driverId as any)._id.toString() === decodedToken.userId;
-
-    if (!isRider && !isDriver) {
+    const userDoc = user as any;
+    if (
+        userDoc.role === 'RIDER' &&
+        ride.riderId._id.toString() !== user._id.toString()
+    ) {
+        throw new AppError(403, 'Access denied');
+    }
+    if (
+        userDoc.role === 'DRIVER' &&
+        ride.driverId?._id.toString() !== user._id.toString()
+    ) {
         throw new AppError(403, 'Access denied');
     }
 
