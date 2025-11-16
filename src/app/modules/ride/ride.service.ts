@@ -61,7 +61,7 @@ const findRides = async (decodedToken: JwtPayload) => {
                     type: 'Point',
                     coordinates: user.currentLocation.coordinates,
                 },
-                $maxDistance: 2000000,
+                $maxDistance: 200000000,
             },
         },
     })

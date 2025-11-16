@@ -33,7 +33,7 @@ export const createUserZodSchema = z.object({
         .string({error: 'Phone number must be string'})
         .regex(/^(?:\+8801\d{9})$/)
         .optional(),
-    NID: z.number().optional(),
+    NID: z.string().optional(),
     age: z.number().min(18, {error: 'You have to'}).optional(),
     isNIDVerified: z.boolean().optional(),
     currentLocation: geoPointZodSchema.optional(),
@@ -66,8 +66,8 @@ export const updateUserZodSchema = z.object({
         .string()
         .regex(/^(?:\+8801\d{9})$/)
         .optional(),
-    NID: z.number(),
-    age: z.number().optional(),
+    NID: z.string(),
+    age: z.string().optional(),
     isNIDVerified: z.boolean().optional(),
     currentLocation: geoPointZodSchema.optional(),
     role: z.enum(Object.values(Role)).optional(),

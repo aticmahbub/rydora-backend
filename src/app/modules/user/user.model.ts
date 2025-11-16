@@ -23,7 +23,7 @@ const userSchema = new Schema<IUser>(
             default: Role.RIDER,
         },
         age: {type: Number},
-        NID: {type: Number, required: true, unique: true},
+        NID: {type: String, required: true, unique: true},
 
         currentLocation: {
             type: {

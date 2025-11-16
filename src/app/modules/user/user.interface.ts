@@ -30,7 +30,7 @@ export interface IUser {
     picture?: string;
     address?: string;
     age?: number;
-    NID: number;
+    NID: string;
 
     currentLocation: IGeoPoint;
 

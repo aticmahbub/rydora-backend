@@ -1,9 +1,8 @@
 import {JwtPayload} from 'jsonwebtoken';
 import AppError from '../../errorHelpers/AppError';
-import {IAuthProvider, IsActive, IUser, Role} from './user.interface';
+import {IAuthProvider, IUser, Role} from './user.interface';
 import {User} from './user.model';
 import bcryptjs from 'bcryptjs';
-import {envVars} from '../../config/env.config';
 
 const createUser = async (payload: Partial<IUser>) => {
     const {email, password, ...rest} = payload;
@@ -49,49 +48,46 @@ const updateUser = async (
     payload: IUser,
     decodedToken: JwtPayload,
 ) => {
+    if (decodedToken.role === Role.DRIVER || decodedToken.role === Role.RIDER) {
+        if (userId !== decodedToken.userId) {
+            throw new AppError(400, 'You are not authorized');
+        }
+    }
     const isUserExist = await User.findById(userId);
+
     if (!isUserExist) {
-        throw new AppError(404, 'User not found');
+        throw new AppError(404, 'User Not Found');
     }
-
-    if (isUserExist.isDeleted || isUserExist.isActive === IsActive.BLOCKED) {
-        throw new AppError(403, 'Forbidden. User is not allowed.');
+    if (
+        decodedToken.role === Role.ADMIN &&
+        isUserExist.role === Role.SUPER_ADMIN
+    ) {
+        throw new AppError(401, 'You are unauthorized');
     }
-    if (payload.role === Role.DRIVER || payload.role === Role.RIDER) {
-        throw new AppError(403, 'Forbidden. User is not allowed.');
-    }
-
-    if (payload.role === Role.SUPER_ADMIN && decodedToken.role === Role.ADMIN) {
-        throw new AppError(
-            403,
-            'Forbidden. User is not allowed to perform this action',
-        );
+    if (payload.role) {
+        if (
+            decodedToken.role === Role.RIDER ||
+            decodedToken.role === Role.DRIVER
+        ) {
+            throw new AppError(403, 'You are not authorized');
+        }
     }
 
     if (payload.isActive || payload.isDeleted || payload.isVerified) {
         if (
-            decodedToken.role === Role.DRIVER ||
-            decodedToken.role === Role.SUPER_ADMIN
+            decodedToken.role === Role.RIDER ||
+            decodedToken.role === Role.DRIVER
         ) {
-            throw new AppError(
-                403,
-                'You are not allowed to perform this action',
-            );
+            throw new AppError(403, 'You are not authorized');
         }
     }
 
-    if (payload.password) {
-        payload.password = await bcryptjs.hash(
-            payload.password,
-            envVars.BCRYPTJS_SALT_ROUND,
-        );
-    }
-    const updatedUser = await User.findByIdAndUpdate(userId, payload, {
+    const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, {
         new: true,
         runValidators: true,
     });
 
-    return updatedUser;
+    return newUpdatedUser;
 };
 
 const getUserInfo = async (userId: string) => {
