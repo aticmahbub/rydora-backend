@@ -32,7 +32,7 @@ export const seedSuperAdmin = async () => {
             password: hashedPassword,
             role: Role.SUPER_ADMIN,
             auths: [authProvider],
-            NID: 1234567890,
+            NID: '1234567890',
             isVerified: true,
         };
         const superAdmin = await User.create(payload);

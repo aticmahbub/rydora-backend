@@ -2,6 +2,8 @@ import {Response} from 'express';
 
 interface TMeta {
     total: number;
+    page?: number;
+    totalPages?: number;
 }
 interface TResponse<T> {
     statusCode: number;

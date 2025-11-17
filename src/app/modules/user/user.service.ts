@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {JwtPayload} from 'jsonwebtoken';
 import AppError from '../../errorHelpers/AppError';
-import {IAuthProvider, IUser, Role} from './user.interface';
+import {IAuthProvider, IsActive, IUser, Role} from './user.interface';
 import {User} from './user.model';
 import bcryptjs from 'bcryptjs';
 
@@ -36,62 +37,273 @@ const createUser = async (payload: Partial<IUser>) => {
     return userWithoutPassword;
 };
 
-const getAllUsers = async () => {
-    const users = await User.find({});
-    const totalUsers = await User.countDocuments();
+const getUsers = async (filters: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    role?: string;
+    isActive?: boolean;
+}) => {
+    const {page = 1, limit = 10, search, role, isActive} = filters;
+    const skip = (page - 1) * limit;
 
-    return {data: users, meta: {total: totalUsers}};
+    // Build query
+    const query: any = {};
+
+    // Search in name, email, phone
+    if (search) {
+        query.$or = [
+            {name: {$regex: search, $options: 'i'}},
+            {email: {$regex: search, $options: 'i'}},
+            {phone: {$regex: search, $options: 'i'}},
+        ];
+    }
+
+    // Filter by role
+    if (role) {
+        query.role = role;
+    }
+
+    // Filter by active status
+    if (isActive !== undefined) {
+        query.isActive = isActive;
+    }
+
+    // Exclude deleted users
+    query.isDeleted = false;
+
+    const [users, total] = await Promise.all([
+        User.find(query)
+            .select('-password')
+            .sort({createdAt: -1})
+            .skip(skip)
+            .limit(limit),
+        User.countDocuments(query),
+    ]);
+
+    return {
+        users,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+    };
+};
+
+const getUserById = async (
+    userId: string,
+    decodedToken?: JwtPayload,
+): Promise<IUser> => {
+    const user = await User.findById(userId).select('-password');
+
+    if (!user) {
+        throw new AppError(404, 'User not found');
+    }
+
+    // Permission checks for non-public access
+    if (decodedToken) {
+        if (
+            decodedToken.role === Role.DRIVER ||
+            decodedToken.role === Role.RIDER
+        ) {
+            if (userId !== decodedToken.userId) {
+                throw new AppError(
+                    403,
+                    'You are not authorized to view this user',
+                );
+            }
+        }
+
+        if (
+            decodedToken.role === Role.ADMIN &&
+            user.role === Role.SUPER_ADMIN
+        ) {
+            throw new AppError(
+                403,
+                'You are unauthorized to view super admin users',
+            );
+        }
+    }
+
+    return user;
 };
 
 const updateUser = async (
     userId: string,
-    payload: IUser,
+    payload: Partial<IUser>,
     decodedToken: JwtPayload,
-) => {
+): Promise<IUser> => {
+    // Check if user is trying to update another user as driver/rider
     if (decodedToken.role === Role.DRIVER || decodedToken.role === Role.RIDER) {
         if (userId !== decodedToken.userId) {
-            throw new AppError(400, 'You are not authorized');
+            throw new AppError(
+                403,
+                'You are not authorized to update other users',
+            );
         }
     }
-    const isUserExist = await User.findById(userId);
 
-    if (!isUserExist) {
-        throw new AppError(404, 'User Not Found');
+    const existingUser = await User.findById(userId);
+    if (!existingUser) {
+        throw new AppError(404, 'User not found');
     }
+
+    // Check if admin is trying to update super admin
     if (
         decodedToken.role === Role.ADMIN &&
-        isUserExist.role === Role.SUPER_ADMIN
+        existingUser.role === Role.SUPER_ADMIN
     ) {
-        throw new AppError(401, 'You are unauthorized');
+        throw new AppError(
+            403,
+            'You are unauthorized to update super admin users',
+        );
     }
+
+    // Role assignment permissions
     if (payload.role) {
         if (
             decodedToken.role === Role.RIDER ||
             decodedToken.role === Role.DRIVER
         ) {
-            throw new AppError(403, 'You are not authorized');
+            throw new AppError(403, 'You are not authorized to change roles');
         }
-    }
 
-    if (payload.isActive || payload.isDeleted || payload.isVerified) {
         if (
-            decodedToken.role === Role.RIDER ||
-            decodedToken.role === Role.DRIVER
+            payload.role === Role.SUPER_ADMIN &&
+            decodedToken.role === Role.ADMIN
         ) {
-            throw new AppError(403, 'You are not authorized');
+            throw new AppError(403, 'You cannot assign SUPER_ADMIN role');
         }
     }
 
-    const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, {
+    // Status field permissions
+    const sensitiveFields = ['isActive', 'isDeleted', 'isVerified'];
+    for (const field of sensitiveFields) {
+        if (field in payload) {
+            if (
+                decodedToken.role === Role.DRIVER ||
+                decodedToken.role === Role.RIDER
+            ) {
+                throw new AppError(
+                    403,
+                    `You are not authorized to update ${field}`,
+                );
+            }
+        }
+    }
+
+    // Prevent self-demotion or self-deactivation
+    if (userId === decodedToken.userId) {
+        if (payload.role && payload.role !== existingUser.role) {
+            throw new AppError(403, 'You cannot change your own role');
+        }
+
+        if (payload.isActive === IsActive.BLOCKED || IsActive.INACTIVE) {
+            throw new AppError(403, 'You cannot deactivate your own account');
+        }
+
+        if (payload.isDeleted === true) {
+            throw new AppError(403, 'You cannot delete your own account');
+        }
+    }
+
+    // Hash password if provided
+    if (payload.password) {
+        payload.password = await bcryptjs.hash(payload.password, 10);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, payload, {
         new: true,
         runValidators: true,
+    }).select('-password');
+
+    if (!updatedUser) {
+        throw new AppError(500, 'Failed to update user');
+    }
+
+    return updatedUser;
+};
+
+const deleteUser = async (
+    userId: string,
+    decodedToken: JwtPayload,
+): Promise<void> => {
+    const existingUser = await User.findById(userId);
+    if (!existingUser) {
+        throw new AppError(404, 'User not found');
+    }
+
+    // Permission checks
+    if (
+        decodedToken.role === Role.ADMIN &&
+        existingUser.role === Role.SUPER_ADMIN
+    ) {
+        throw new AppError(
+            403,
+            'You are unauthorized to delete super admin users',
+        );
+    }
+
+    if (decodedToken.role === Role.DRIVER || decodedToken.role === Role.RIDER) {
+        if (userId !== decodedToken.userId) {
+            throw new AppError(
+                403,
+                'You are not authorized to delete other users',
+            );
+        }
+    }
+
+    // Prevent self-deletion
+    if (userId === decodedToken.userId) {
+        throw new AppError(403, 'You cannot delete your own account');
+    }
+
+    await User.findByIdAndUpdate(userId, {
+        isDeleted: true,
+        isActive: false,
+        deletedAt: new Date(),
     });
-
-    return newUpdatedUser;
 };
 
-const getUserInfo = async (userId: string) => {
-    const user = await User.findById(userId).select('-password');
-    return {data: user};
+const bulkUpdateUsers = async (
+    userIds: string[],
+    payload: Partial<IUser>,
+    decodedToken: JwtPayload,
+): Promise<{updatedCount: number}> => {
+    if (decodedToken.role === Role.DRIVER || decodedToken.role === Role.RIDER) {
+        throw new AppError(403, 'You are not authorized for bulk operations');
+    }
+
+    // Check if any user is super admin when updating as admin
+    if (decodedToken.role === Role.ADMIN) {
+        const superAdminUsers = await User.find({
+            _id: {$in: userIds},
+            role: Role.SUPER_ADMIN,
+        });
+
+        if (superAdminUsers.length > 0) {
+            throw new AppError(403, 'Cannot update super admin users');
+        }
+    }
+
+    // Remove sensitive fields for non-super-admins
+    const filteredPayload = {...payload};
+    if (decodedToken.role !== Role.SUPER_ADMIN) {
+        delete filteredPayload.role;
+        delete filteredPayload.isDeleted;
+    }
+
+    const result = await User.updateMany(
+        {_id: {$in: userIds}},
+        filteredPayload,
+    );
+
+    return {updatedCount: result.modifiedCount};
 };
-export const UserService = {createUser, getAllUsers, updateUser, getUserInfo};
+export const UserService = {
+    createUser,
+    getUsers,
+    getUserById,
+    updateUser,
+    deleteUser,
+    bulkUpdateUsers,
+};
